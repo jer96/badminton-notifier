@@ -7,7 +7,6 @@ import { Rule, RuleTargetInput, Schedule } from "aws-cdk-lib/aws-events"
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets"
 import {
     DEFAULT_GET_APPOINTMENTS_REQUEST,
-    FLUSHING_GET_APPOINTMENTS_REQUEST,
 } from "./constants"
 
 export class ShuttlerStack extends cdk.Stack {
@@ -35,35 +34,7 @@ export class ShuttlerStack extends cdk.Stack {
             event: RuleTargetInput.fromObject(DEFAULT_GET_APPOINTMENTS_REQUEST),
         })
 
-        const flushingLambdaTarget = new LambdaFunction(schedulerLambda, {
-            event: RuleTargetInput.fromObject(
-                FLUSHING_GET_APPOINTMENTS_REQUEST
-            ),
-        })
-
-        const twelvePmRule = new Rule(this, "12pmDailyScheduleRule", {
-            schedule: Schedule.cron({
-                minute: "0",
-                hour: "16",
-                month: "*",
-                weekDay: "MON-SUN",
-                year: "*",
-            }),
-            targets: [lambdaTarget],
-        })
-
-        const sixPmRule = new Rule(this, "6pmDailyScheduleRule", {
-            schedule: Schedule.cron({
-                minute: "30",
-                hour: "22",
-                month: "*",
-                weekDay: "MON-SUN",
-                year: "*",
-            }),
-            targets: [lambdaTarget],
-        })
-
-        const hourlyFlushingRule = new Rule(this, "HourlyFlushingRule", {
+        const hourlyRule = new Rule(this, "HourlyRule", {
             schedule: Schedule.cron({
                 minute: "0",
                 hour: "9-23", // This will run from 7 AM to 11 PM
@@ -71,7 +42,7 @@ export class ShuttlerStack extends cdk.Stack {
                 weekDay: "MON-SUN",
                 year: "*",
             }),
-            targets: [flushingLambdaTarget],
+            targets: [lambdaTarget],
         })
     }
 }

@@ -12,7 +12,7 @@ export const DEFAULT_DATE_FILTER: DateFilter = {
     weekFilter: [
         {
             dayOfWeek: "sunday",
-            startHour: 11,
+            startHour: 12,
             endHour: 18,
             enabled: true,
         },
@@ -26,7 +26,9 @@ export const DEFAULT_DATE_FILTER: DateFilter = {
         },
         {
             dayOfWeek: "wednesday",
-            enabled: false,
+            startHour: 18,
+            endHour: 20,
+            enabled: true,
         },
         {
             dayOfWeek: "thursday",
@@ -42,7 +44,7 @@ export const DEFAULT_DATE_FILTER: DateFilter = {
         },
         {
             dayOfWeek: "saturday",
-            startHour: 11,
+            startHour: 12,
             endHour: 18,
             enabled: true,
         },
