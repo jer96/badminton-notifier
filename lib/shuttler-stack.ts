@@ -37,7 +37,7 @@ export class ShuttlerStack extends cdk.Stack {
         const hourlyRule = new Rule(this, "HourlyRule", {
             schedule: Schedule.cron({
                 minute: "0",
-                hour: "9-23", // This will run from 7 AM to 11 PM
+                hour: "14-4", // This will run from 9 AM to 11 PM EST (UTC-5)
                 month: "*",
                 weekDay: "MON-SUN",
                 year: "*",
