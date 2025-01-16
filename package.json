@@ -5,11 +5,12 @@
         "shuttler": "bin/shuttler.js"
     },
     "scripts": {
-        "build": "tsc",
+        "clean": "rm -rf dist/*",
+        "build": "npm run clean && tsc",
+        "local": "npm run build && node dist/lib/local.js",
         "watch": "tsc -w",
         "test": "jest",
-        "cdk": "cdk",
-        "local": "npm run build && node lib/local.js"
+        "cdk": "cdk"
     },
     "devDependencies": {
         "@types/axios": "^0.9.36",
@@ -24,7 +25,6 @@
         "typescript": "~5.4.5"
     },
     "dependencies": {
-        "@aws-sdk/client-bedrock-runtime": "^3.564.0",
         "@aws-sdk/client-sns": "^3.564.0",
         "aws-cdk-lib": "2.139.0",
         "axios": "^1.6.8",

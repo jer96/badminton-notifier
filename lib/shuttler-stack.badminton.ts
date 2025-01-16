@@ -1,8 +1,6 @@
-import { constructPrompt, invokeModel } from "./bedrock.js"
 import {
     TIME_ZONE,
     MINUTE_START_TIMES,
-    OWNER,
     CHECK_TIMES_URL,
     CHECK_TIMES_REQUESTS,
 } from "./constants.js"
@@ -25,27 +23,33 @@ import Handlebars = require("handlebars")
 const getDateTimesForLocations = (
     isoDatesTimes: string[],
     locations: BadmintonLocation[]
-): DateTime[] => {
-    let dateTimes: DateTime[] = []
-    isoDatesTimes.forEach((dateTime: string) => {
-        locations.forEach((location) => {
-            location.courts.forEach((court: any) => {
-                const calendarId = court.id
+): Map<BadmintonLocation, DateTime[]> => {
+    let dateTimeMap = new Map<BadmintonLocation, DateTime[]>();
+
+    locations.forEach((location) => {
+        let locationDateTimes: DateTime[] = [];
+
+        isoDatesTimes.forEach((dateTime: string) => {
+            location.courts.forEach((court: Court) => {
+                const calendarId = court.id;
                 location.appointmentTypes.forEach((appointment) => {
-                    const typeId = appointment.id
+                    const typeId = appointment.id;
                     const dateTimeRequest: DateTime = {
                         datetime: dateTime,
                         appointmentTypeId: typeId,
                         calendarId: calendarId,
                         quantity: 1,
-                    }
-                    dateTimes.push(dateTimeRequest)
-                })
-            })
-        })
-    })
-    return dateTimes
-}
+                    };
+                    locationDateTimes.push(dateTimeRequest);
+                });
+            });
+        });
+
+        dateTimeMap.set(location, locationDateTimes);
+    });
+
+    return dateTimeMap;
+};
 
 const getTimeFilter = (
     currentDay: number,
@@ -87,7 +91,7 @@ const getLocalizedFutureDates = (
         if (timeFilter !== undefined && timeFilter.enabled) {
             const minHour =
                 timeFilter.startHour !== undefined &&
-                timeFilter.startHour !== null
+                    timeFilter.startHour !== null
                     ? timeFilter.startHour
                     : 0
             const maxHour =
@@ -112,7 +116,8 @@ const getLocalizedFutureDates = (
 }
 
 const createCheckTimesPayloads = (
-    dateTimes: DateTime[]
+    dateTimes: DateTime[],
+    owner: string
 ): CheckTimesRequest[] => {
     const totalDateTimes = dateTimes.length
     const maxPerRequest = Math.ceil(totalDateTimes / CHECK_TIMES_REQUESTS)
@@ -122,7 +127,7 @@ const createCheckTimesPayloads = (
         const slice = dateTimes.slice(i, i + maxPerRequest)
         const checkTimesRequest: CheckTimesRequest = {
             datetimes: slice,
-            owner: OWNER,
+            owner: owner
         }
         requests.push(checkTimesRequest)
     }
@@ -194,22 +199,21 @@ export const getAppointments = async (
     dateFilter: DateFilter,
     locations: BadmintonLocation[]
 ): Promise<CheckTimesResponse[]> => {
-    const dates = getLocalizedFutureDates(daysIntoFuture, dateFilter)
-    const dateTimes = getDateTimesForLocations(dates, locations)
-    const payloads = createCheckTimesPayloads(dateTimes)
-    const availableTimes = await submitCheckTimesPayloads(payloads, locations)
-    return availableTimes
-}
+    const dates = getLocalizedFutureDates(daysIntoFuture, dateFilter);
+    const dateTimeMap = getDateTimesForLocations(dates, locations);
 
-export const getLLMResponse = async (
-    appointments: CheckTimesResponse[]
-): Promise<string> => {
-    const prompt = constructPrompt({
-        appointments: appointments,
-    })
-    const llmResponse = await invokeModel(prompt)
-    return llmResponse
-}
+    let allAvailableTimes: CheckTimesResponse[] = [];
+
+    // Process each location's dateTimes separately
+    for (const [location, dateTimes] of dateTimeMap) {
+        const payloads = createCheckTimesPayloads(dateTimes, location.owner);
+        const availableTimes = await submitCheckTimesPayloads(payloads, [location]);
+        allAvailableTimes.push(...availableTimes);
+    }
+
+    return allAvailableTimes;
+};
+
 
 export const formatStaticResponse = (
     appointments: CheckTimesResponse[]
@@ -236,7 +240,6 @@ export const handler = async (event: GetAppointments) => {
     )
     if (appointments.length > 0) {
         const response = formatStaticResponse(appointments)
-        // const response = await getLLMResponse(appointments)
         await sendAppointmentNotification(response)
         return response
     } else {

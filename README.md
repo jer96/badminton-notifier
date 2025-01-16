@@ -9,5 +9,4 @@ email notifier for badminton appointments
 
 ## commands 
 - `npm run build`
-- `cdk deploy ShuttlerStack --profile badminton`
-
+- `cdk deploy ShuttlerStack

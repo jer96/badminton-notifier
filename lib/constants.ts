@@ -2,7 +2,6 @@ import { BadmintonLocation, DateFilter, GetAppointments } from "./types"
 
 export const CHECK_TIMES_URL =
     "https://nybcreservation.as.me/api/scheduling/v1/availability/check-times"
-export const OWNER = "6efeecae"
 export const TIME_ZONE = "America/New_York"
 export const MAX_DAYS = 30
 export const CHECK_TIMES_REQUESTS = 25
@@ -53,6 +52,7 @@ export const DEFAULT_DATE_FILTER: DateFilter = {
 
 export const FLUSHING: BadmintonLocation = {
     name: "NYBC Flushing",
+    owner: "6efeecae",
     courts: [
         {
             id: 6015029,
@@ -109,34 +109,35 @@ export const FLUSHING: BadmintonLocation = {
 
 export const BROOKLYN: BadmintonLocation = {
     name: "BKBC Brooklyn",
+    owner: "474f915b",
     courts: [
         {
-            id: 8510150,
-            name: "Court 1 VIP",
+            id: 10414160,
+            name: "Court 1",
         },
         {
-            id: 8510186,
+            id: 10414169,
             name: "Court 2",
         },
         {
-            id: 8510188,
+            id: 10414175,
             name: "Court 3",
         },
         {
-            id: 8510202,
+            id: 10414180,
             name: "Court 4",
         },
         {
-            id: 8510203,
+            id: 10414185,
             name: "Court 5",
         },
         {
-            id: 8510236,
+            id: 10414190,
             name: "Court 6",
         },
         {
-            id: 8510233,
-            name: "Court 7 VIP",
+            id: 10414194,
+            name: "Court 7",
         },
     ],
     appointmentTypes: [
@@ -146,23 +147,23 @@ export const BROOKLYN: BadmintonLocation = {
         // },
         // {
         //     duration: 60,
-        //     id: 48095023,
+        //     id: 65420226,
         // },
         {
             duration: 90,
-            id: 48095116,
+            id: 65420220,
         },
         {
             duration: 105,
-            id: 48096009,
+            id: 65420258,
         },
         {
             duration: 120,
-            id: 27042201,
+            id: 65420276,
         },
         // {
         //     duration: 150,
-        //     id: 48096162,
+        //     id: 65420293,
         // },
     ],
 }
@@ -179,4 +180,10 @@ export const FLUSHING_GET_APPOINTMENTS_REQUEST: GetAppointments = {
     daysIntoFuture: MAX_DAYS,
     dateFilter: DEFAULT_DATE_FILTER,
     locations: [FLUSHING],
+}
+
+export const BROOKLYN_GET_APPOINTMENTS_REQUEST: GetAppointments = {
+    daysIntoFuture: MAX_DAYS,
+    dateFilter: DEFAULT_DATE_FILTER,
+    locations: [BROOKLYN],
 }

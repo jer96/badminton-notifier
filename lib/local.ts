@@ -1,4 +1,3 @@
-import { constructPrompt } from "./bedrock.js"
 import { DEFAULT_GET_APPOINTMENTS_REQUEST } from "./constants.js"
 import { getAppointments } from "./shuttler-stack.badminton.js"
 
@@ -22,10 +21,6 @@ export const handler = async (event: GetAppointments) => {
         event.dateFilter,
         event.locations
     )
-    const prompt = constructPrompt({
-        appointments: appointments,
-    })
-    console.log(prompt)
     writeDataToFile("times.json", appointments)
 }
 

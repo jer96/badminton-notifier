@@ -8,6 +8,7 @@ export interface BadmintonLocation {
     name: string
     courts: Court[]
     appointmentTypes: AppointmentType[]
+    owner: string
 }
 
 export interface Court {

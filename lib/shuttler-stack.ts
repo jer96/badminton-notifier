@@ -1,7 +1,6 @@
 import * as cdk from "aws-cdk-lib"
 import { Construct } from "constructs"
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs"
-import { PolicyStatement } from "aws-cdk-lib/aws-iam"
 import { Topic } from "aws-cdk-lib/aws-sns"
 import { Rule, RuleTargetInput, Schedule } from "aws-cdk-lib/aws-events"
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets"
@@ -23,12 +22,6 @@ export class ShuttlerStack extends cdk.Stack {
                 ["APPOINTMENT_NOTIFIER_SNS_TOPIC"]: topic.topicArn,
             },
         })
-        schedulerLambda.addToRolePolicy(
-            new PolicyStatement({
-                actions: ["bedrock:InvokeModel", "bedrock-runtime:InvokeModel"],
-                resources: ["*"],
-            })
-        )
         topic.grantPublish(schedulerLambda)
         const lambdaTarget = new LambdaFunction(schedulerLambda, {
             event: RuleTargetInput.fromObject(DEFAULT_GET_APPOINTMENTS_REQUEST),
